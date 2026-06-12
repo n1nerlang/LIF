@@ -1,0 +1,11 @@
+{
+  "name": "lif",
+  "scripts": {
+    "dev": "echo \"No dev server configured for LIF. Add a Lua-based dev workflow or update package.json.\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.17.0",
+    "lucide-react": "^1.18.0",
+    "react-router-dom": "^7.17.0"
+  }
+}
