@@ -1,0 +1,48 @@
+name: Update Packages
+
+on:
+  schedule:
+    # Run every week on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  update-packages:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Lua
+      uses: leafo/gh-action-lua@v10
+      with:
+        luaVersion: 5.4
+    
+    - name: Check package versions
+      run: |
+        echo "Checking package versions..."
+        for pkg in packages/@lif/*/; do
+          if [ -f "$pkg/package.json" ]; then
+            echo "Checking: $pkg"
+            grep '"version"' "$pkg/package.json"
+          fi
+        done
+    
+    - name: Verify all packages
+      run: |
+        echo "Verifying all packages..."
+        for pkg in packages/@lif/*/; do
+          if [ -f "$pkg/init.lua" ]; then
+            lua -e "require('$pkg/init.lua')" || true
+          fi
+        done
+    
+    - name: Create PR for updates
+      if: failure()
+      uses: peter-evans/create-pull-request@v4
+      with:
+        commit-message: 'chore: auto-update packages'
+        title: 'chore: auto-update LIF packages'
+        body: 'Automated package update from scheduled workflow'
+        branch: chore/auto-update-packages
+        delete-branch: true

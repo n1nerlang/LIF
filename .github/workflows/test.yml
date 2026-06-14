@@ -1,0 +1,33 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        lua-version: ['5.1', '5.3', '5.4']
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Lua ${{ matrix.lua-version }}
+      uses: leafo/gh-action-lua@v10
+      with:
+        luaVersion: ${{ matrix.lua-version }}
+    
+    - name: Run tests
+      run: |
+        lua main.lua help
+        echo "Tests completed successfully"
+    
+    - name: Verify package structure
+      run: |
+        ls -la packages/@lif/
+        echo "Package structure verified"

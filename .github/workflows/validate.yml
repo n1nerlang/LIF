@@ -1,0 +1,59 @@
+name: Validate Packages
+
+on:
+  push:
+    paths:
+      - 'packages/**'
+      - 'package.json'
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'package.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Validate package.json files
+      run: |
+        echo "Validating package.json files..."
+        for file in packages/@lif/*/package.json; do
+          echo "Validating: $file"
+          if ! grep -q '"name"' "$file"; then
+            echo "ERROR: Missing 'name' in $file"
+            exit 1
+          fi
+          if ! grep -q '"version"' "$file"; then
+            echo "ERROR: Missing 'version' in $file"
+            exit 1
+          fi
+          if ! grep -q '"entry"' "$file"; then
+            echo "ERROR: Missing 'entry' in $file"
+            exit 1
+          fi
+        done
+        echo "All package.json files are valid!"
+    
+    - name: Validate init.lua files
+      run: |
+        echo "Validating init.lua files..."
+        for file in packages/@lif/*/init.lua; do
+          if [ ! -f "$file" ]; then
+            echo "ERROR: Missing init.lua"
+            exit 1
+          fi
+          echo "  ✓ $file"
+        done
+        echo "All init.lua files exist!"
+    
+    - name: Check README files
+      run: |
+        echo "Checking README files..."
+        for dir in packages/@lif/*/; do
+          if [ ! -f "$dir/README.md" ]; then
+            echo "WARNING: Missing README.md in $dir"
+          fi
+        done

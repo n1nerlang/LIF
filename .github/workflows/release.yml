@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Get tag version
+      id: tag
+      run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+    
+    - name: Generate changelog
+      run: |
+        echo "# Release ${{ steps.tag.outputs.version }}" > CHANGELOG.txt
+        echo "" >> CHANGELOG.txt
+        echo "## Packages" >> CHANGELOG.txt
+        for pkg in packages/@lif/*/; do
+          pkg_name=$(basename "$pkg")
+          if [ -f "$pkg/package.json" ]; then
+            version=$(grep '"version"' "$pkg/package.json" | head -1 | grep -o '[0-9.]*')
+            echo "- $pkg_name: $version" >> CHANGELOG.txt
+          fi
+        done
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body_path: CHANGELOG.txt
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

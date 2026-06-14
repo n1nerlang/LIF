@@ -1,0 +1,8 @@
+{
+  "name": "@lif/template-forproject",
+  "version": "1.0.0",
+  "description": "Project templates for LIF",
+  "author": "n1nerlang",
+  "license": "MIT",
+  "entry": "init.lua"
+}

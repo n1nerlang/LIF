@@ -1,0 +1,8 @@
+{
+  "name": "@lif/testing",
+  "version": "1.1.0",
+  "description": "Testing framework and assertions for LIF",
+  "author": "n1nerlang",
+  "license": "MIT",
+  "entry": "init.lua"
+}
